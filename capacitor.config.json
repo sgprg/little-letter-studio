@@ -1,0 +1,8 @@
+{
+  "appId": "org.littleletterstudio.app",
+  "appName": "Little Letter Studio",
+  "webDir": "dist",
+  "backgroundColor": "#f2f5fc",
+  "ios": { "contentInset": "never" },
+  "android": { "allowMixedContent": false }
+}

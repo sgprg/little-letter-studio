@@ -1,0 +1,34 @@
+{
+  "name": "little-letter-studio",
+  "version": "0.1.0-alpha.1",
+  "private": true,
+  "type": "module",
+  "license": "Apache-2.0",
+  "description": "An offline, trilingual coloring book for little hands.",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "vite --host 0.0.0.0",
+    "build": "tsc --noEmit && vite build && node scripts/build-offline.mjs",
+    "preview": "vite preview --host 0.0.0.0",
+    "test": "playwright test",
+    "licenses": "node scripts/check-licenses.mjs",
+    "native:sync": "npm run build && cap sync",
+    "native:android": "cap open android",
+    "native:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "8.4.3",
+    "@capacitor/core": "8.4.3",
+    "@capacitor/filesystem": "8.1.3",
+    "@capacitor/ios": "8.4.3",
+    "@capacitor/share": "8.0.2"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "8.4.3",
+    "@playwright/test": "1.63.0",
+    "typescript": "7.0.2",
+    "vite": "7.3.6"
+  }
+}

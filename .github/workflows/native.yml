@@ -1,0 +1,59 @@
+name: Native alpha builds
+on:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: android-actions/setup-android@v3
+      - run: sdkmanager 'platforms;android-36' 'build-tools;36.0.0'
+      - run: npm ci
+      - run: npm run licenses
+      - run: npm run build
+      - run: npx cap sync android
+      - name: Build sideloadable debug APK
+        working-directory: android
+        run: |
+          chmod +x gradlew
+          ./gradlew assembleDebug --no-daemon
+          ./gradlew :app:dependencies --configuration debugRuntimeClasspath > native-dependencies.txt
+      - uses: actions/upload-artifact@v4
+        with:
+          name: little-letter-studio-android-debug
+          path: |
+            android/app/build/outputs/apk/debug/app-debug.apk
+            android/native-dependencies.txt
+          retention-days: 30
+  ios-simulator:
+    runs-on: macos-15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run licenses
+      - run: npm run build
+      - run: npx cap sync ios
+      - name: Build unsigned iPhone and iPad simulator app
+        run: |
+          xcodebuild -version
+          xcodebuild -project ios/App/App.xcodeproj -scheme App -configuration Debug -sdk iphonesimulator -destination 'generic/platform=iOS Simulator' -derivedDataPath build/ios CODE_SIGNING_ALLOWED=NO build
+          ditto -c -k --sequesterRsrc --keepParent build/ios/Build/Products/Debug-iphonesimulator/App.app little-letter-studio-ios-simulator.zip
+      - uses: actions/upload-artifact@v4
+        with:
+          name: little-letter-studio-ios-simulator
+          path: little-letter-studio-ios-simulator.zip
+          retention-days: 30

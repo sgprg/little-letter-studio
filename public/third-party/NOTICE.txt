@@ -1,0 +1,8 @@
+Little Letter Studio
+Copyright 2026 Little Letter Studio contributors
+
+The original application code, curriculum data, documentation and vector
+illustrations in this repository are licensed under the Apache License,
+Version 2.0. Third-party components retain their own licenses and notices.
+
+See LICENSE, THIRD_PARTY_NOTICES.md and docs/DEPENDENCIES.json.

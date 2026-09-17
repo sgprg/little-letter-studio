@@ -1,0 +1,91 @@
+export type Locale = 'en' | 'ru' | 'cs';
+export type Entry = { word: string; letter: string; sentence: string };
+export type Picture = { id: string; group: 'animals' | 'world'; words: Record<Locale, Entry> };
+const entry = (letter: string, word: string, sentence: string): Entry => ({ letter, word, sentence });
+export const pictures: Picture[] = [
+  { id: 'cat', group: 'animals', words: { en: entry('C','cat','The cat plays with a ball.'), ru: entry('К','кот','Кот играет с мячом.'), cs: entry('K','kočka','Kočka si hraje s míčem.') } },
+  { id: 'dog', group: 'animals', words: { en: entry('D','dog','The dog wags its tail.'), ru: entry('С','собака','Собака виляет хвостом.'), cs: entry('P','pes','Pes vrtí ocasem.') } },
+  { id: 'elephant', group: 'animals', words: { en: entry('E','elephant','The elephant has big ears.'), ru: entry('С','слон','У слона большие уши.'), cs: entry('S','slon','Slon má velké uši.') } },
+  { id: 'fox', group: 'animals', words: { en: entry('F','fox','The fox has a fluffy tail.'), ru: entry('Л','лиса','У лисы пушистый хвост.'), cs: entry('L','liška','Liška má huňatý ocas.') } },
+  { id: 'hedgehog', group: 'animals', words: { en: entry('H','hedgehog','The hedgehog walks through the grass.'), ru: entry('Ё','ёж','Ёж идёт по траве.'), cs: entry('J','ježek','Ježek jde trávou.') } },
+  { id: 'owl', group: 'animals', words: { en: entry('O','owl','The owl sits on a branch.'), ru: entry('С','сова','Сова сидит на ветке.'), cs: entry('S','sova','Sova sedí na větvi.') } },
+  { id: 'fish', group: 'animals', words: { en: entry('F','fish','The fish swims in the water.'), ru: entry('Р','рыба','Рыба плавает в воде.'), cs: entry('R','ryba','Ryba plave ve vodě.') } },
+  { id: 'butterfly', group: 'animals', words: { en: entry('B','butterfly','The butterfly visits a flower.'), ru: entry('Б','бабочка','Бабочка летит к цветку.'), cs: entry('M','motýl','Motýl letí ke květině.') } },
+  { id: 'frog', group: 'animals', words: { en: entry('F','frog','The frog sits on a leaf.'), ru: entry('Л','лягушка','Лягушка сидит на листе.'), cs: entry('Ž','žába','Žába sedí na listu.') } },
+  { id: 'giraffe', group: 'animals', words: { en: entry('G','giraffe','The giraffe has a long neck.'), ru: entry('Ж','жираф','У жирафа длинная шея.'), cs: entry('Ž','žirafa','Žirafa má dlouhý krk.') } },
+  { id: 'chameleon', group: 'animals', words: { en: entry('C','chameleon','The chameleon holds a branch.'), ru: entry('Х','хамелеон','Хамелеон держится за ветку.'), cs: entry('Ch','chameleon','Chameleon se drží větve.') } },
+  { id: 'stork', group: 'animals', words: { en: entry('S','stork','The stork stands in its nest.'), ru: entry('А','аист','Аист стоит в гнезде.'), cs: entry('Č','čáp','Čáp stojí v hnízdě.') } },
+  { id: 'river', group: 'world', words: { en: entry('R','river','A boat floats on the river.'), ru: entry('Р','река','По реке плывёт лодка.'), cs: entry('Ř','řeka','Po řece pluje loďka.') } },
+  { id: 'apple', group: 'world', words: { en: entry('A','apple','The apple grows on a tree.'), ru: entry('Я','яблоко','Яблоко растёт на дереве.'), cs: entry('J','jablko','Jablko roste na stromě.') } },
+  { id: 'house', group: 'world', words: { en: entry('H','house','The house has an open door.'), ru: entry('Д','дом','У дома открыта дверь.'), cs: entry('D','dům','Dům má otevřené dveře.') } },
+  { id: 'snail', group: 'animals', words: { en: entry('S','snail','The snail carries its shell.'), ru: entry('У','улитка','Улитка несёт свой домик.'), cs: entry('Š','šnek','Šnek si nese ulitu.') } },
+];
+
+export const text = {
+  en: {
+    brand: 'Little Letter Studio', book: 'My coloring book', tagline: 'A little color. A little discovery.',
+    animals: 'Animals', world: 'Our world', all: 'All pictures', letters: 'Letters in this book',
+    fill: 'Fill', pencil: 'Pencil', brush: 'Brush', crayon: 'Crayon', eraser: 'Eraser',
+    undo: 'Undo', redo: 'Redo', colors: 'Colors', more: 'More colors', less: 'Fewer colors',
+    size: 'Size', small: 'Small', medium: 'Medium', large: 'Large', easy: 'Stay inside', free: 'Draw freely',
+    listen: 'Listen', parent: 'For grown-ups', close: 'Close', next: 'Next picture', previous: 'Previous picture',
+    saved: 'Saved on this device', saving: 'Saving…', saveError: 'Could not save. Keep this page open and export your picture.',
+    hint: 'Pick a color. Touch the picture.', penOnly: 'Pencil only', finger: 'Finger & pencil',
+    gateTitle: 'Hello, grown-up!', gateHint: 'To open settings, type the answer.', gateLabel: 'What is 7 + 8?', enter: 'Open settings', wrong: 'Try again.',
+    about: 'A small, free coloring book in three languages. All 16 pictures are yours to explore.',
+    privacy: 'Pictures stay in this browser on this device. No accounts, ads, purchases or analytics. The hosting provider receives ordinary connection information when you load the app.',
+    install: 'On iPhone or iPad: open in Safari, then Share → Add to Home Screen. On Android: use the browser menu → Install app. Open once online before playing offline.',
+    voice: 'Listening uses an installed, local device voice when one is available. No online voice service is used. It reads words and sentences, not phonics.',
+    noVoice: 'No offline voice for this language is installed on this device.', export: 'Save picture as PNG', clear: 'Start this picture again', clearAll: 'Delete all saved pictures',
+    confirmClear: 'Erase the colors in this picture?', confirmAll: 'Delete all pictures saved in this browser? This cannot be undone.', cancel: 'Keep drawing', erase: 'Erase',
+    modeHelp: 'Stay inside keeps a stroke in the shape where it started. Pencil only ignores finger touches on the paper.',
+    limit: 'This picture is full of color! Save it as a PNG, or undo a few strokes to keep drawing.',
+    offline: 'Ready for offline play', onlineFirst: 'Preparing offline play…', exportError: 'Could not export this picture. Try again in your browser.',
+    gallery: 'Choose a picture', alpha: 'Alpha · 16 pictures', language: 'Language', colorNames: ['Red','Orange','Yellow','Green','Blue','Purple','Pink','Brown','Peach','Black','White','Teal','Coral','Gold','Lime','Mint','Sky blue','Indigo','Lavender','Rose','Sand','Slate','Plum','Forest green'],
+  },
+  ru: {
+    brand: 'Мастерская букв', book: 'Моя раскраска', tagline: 'Немного цвета. Немного открытий.',
+    animals: 'Животные', world: 'Наш мир', all: 'Все картинки', letters: 'Буквы в этой книге',
+    fill: 'Заливка', pencil: 'Карандаш', brush: 'Кисть', crayon: 'Мелок', eraser: 'Ластик', undo: 'Отменить', redo: 'Повторить', colors: 'Цвета', more: 'Ещё цвета', less: 'Меньше цветов',
+    size: 'Размер', small: 'Маленький', medium: 'Средний', large: 'Большой', easy: 'Внутри контура', free: 'Рисовать свободно',
+    listen: 'Послушать', parent: 'Для взрослых', close: 'Закрыть', next: 'Следующая картинка', previous: 'Предыдущая картинка',
+    saved: 'Сохранено на устройстве', saving: 'Сохраняем…', saveError: 'Не удалось сохранить. Не закрывайте страницу и скачайте рисунок.',
+    hint: 'Выбери цвет. Коснись картинки.', penOnly: 'Только стилус', finger: 'Палец и стилус',
+    gateTitle: 'Привет, взрослые!', gateHint: 'Чтобы открыть настройки, введите ответ.', gateLabel: 'Сколько будет 7 + 8?', enter: 'Открыть настройки', wrong: 'Попробуйте ещё раз.',
+    about: 'Бесплатная раскраска на трёх языках. Все 16 картинок доступны сразу.',
+    privacy: 'Рисунки остаются в этом браузере на этом устройстве. Нет аккаунтов, рекламы, покупок и аналитики. При загрузке приложения хостинг получает обычные сведения о соединении.',
+    install: 'На iPhone и iPad: откройте в Safari, затем «Поделиться» → «На экран Домой». На Android: меню браузера → «Установить приложение». Перед игрой без интернета откройте приложение онлайн.',
+    voice: 'Для озвучивания используется установленный на устройстве локальный голос, если он доступен. Сетевые службы не используются. Озвучиваются слова и предложения, а не отдельные звуки.',
+    noVoice: 'На устройстве нет локального голоса для этого языка.', export: 'Скачать рисунок PNG', clear: 'Начать эту картинку заново', clearAll: 'Удалить все сохранённые рисунки',
+    confirmClear: 'Стереть цвета на этой картинке?', confirmAll: 'Удалить все рисунки в этом браузере? Это нельзя отменить.', cancel: 'Продолжить рисовать', erase: 'Стереть',
+    modeHelp: 'Режим «Внутри контура» удерживает штрих в выбранной области. Режим «Только стилус» отключает рисование пальцем.',
+    limit: 'На картинке уже много штрихов! Скачайте её или отмените несколько штрихов, чтобы продолжить.',
+    offline: 'Можно играть без интернета', onlineFirst: 'Готовим игру без интернета…', exportError: 'Не удалось скачать рисунок. Попробуйте открыть игру в браузере.',
+    gallery: 'Выбрать картинку', alpha: 'Альфа · 16 картинок', language: 'Язык', colorNames: ['Красный','Оранжевый','Жёлтый','Зелёный','Синий','Фиолетовый','Розовый','Коричневый','Персиковый','Чёрный','Белый','Бирюзовый','Коралловый','Золотой','Лаймовый','Мятный','Голубой','Индиго','Лавандовый','Малиновый','Песочный','Серый','Сливовый','Тёмно-зелёный'],
+  },
+  cs: {
+    brand: 'Dílna písmenek', book: 'Moje omalovánky', tagline: 'Trochu barev. Trochu objevování.',
+    animals: 'Zvířata', world: 'Náš svět', all: 'Všechny obrázky', letters: 'Písmena v této knize',
+    fill: 'Vybarvit', pencil: 'Pastelka', brush: 'Štětec', crayon: 'Voskovka', eraser: 'Guma', undo: 'Zpět', redo: 'Znovu', colors: 'Barvy', more: 'Další barvy', less: 'Méně barev',
+    size: 'Velikost', small: 'Malá', medium: 'Střední', large: 'Velká', easy: 'Uvnitř čar', free: 'Kreslit volně',
+    listen: 'Poslechnout', parent: 'Pro dospělé', close: 'Zavřít', next: 'Další obrázek', previous: 'Předchozí obrázek',
+    saved: 'Uloženo v tomto zařízení', saving: 'Ukládání…', saveError: 'Uložení se nezdařilo. Nezavírejte stránku a stáhněte si obrázek.',
+    hint: 'Vyber barvu. Dotkni se obrázku.', penOnly: 'Jen stylus', finger: 'Prst a stylus',
+    gateTitle: 'Ahoj, dospěláci!', gateHint: 'Pro otevření nastavení napište odpověď.', gateLabel: 'Kolik je 7 + 8?', enter: 'Otevřít nastavení', wrong: 'Zkuste to znovu.',
+    about: 'Malé omalovánky zdarma ve třech jazycích. Všech 16 obrázků je hned k dispozici.',
+    privacy: 'Obrázky zůstávají v tomto prohlížeči a zařízení. Žádné účty, reklamy, nákupy ani analytika. Při načítání aplikace hosting získává běžné údaje o připojení.',
+    install: 'Na iPhonu nebo iPadu: otevřete v Safari, pak Sdílet → Přidat na plochu. Na Androidu: nabídka prohlížeče → Nainstalovat aplikaci. Před hraním bez internetu aplikaci jednou otevřete online.',
+    voice: 'Čtení používá místní hlas nainstalovaný v zařízení, pokud je dostupný. Žádné online hlasové služby. Čte slova a věty, neučí jednotlivé hlásky.',
+    noVoice: 'V zařízení není nainstalovaný místní hlas pro tento jazyk.', export: 'Stáhnout obrázek PNG', clear: 'Začít tento obrázek znovu', clearAll: 'Smazat všechny uložené obrázky',
+    confirmClear: 'Smazat barvy v tomto obrázku?', confirmAll: 'Smazat všechny obrázky v tomto prohlížeči? Tuto akci nelze vrátit.', cancel: 'Pokračovat v kreslení', erase: 'Smazat',
+    modeHelp: 'Režim „Uvnitř čar“ udrží tah v oblasti, kde začal. Režim „Jen stylus“ vypne kreslení prstem.',
+    limit: 'Obrázek už je plný tahů! Stáhněte si ho nebo vraťte několik tahů zpět a kreslete dál.',
+    offline: 'Připraveno pro hraní bez internetu', onlineFirst: 'Připravujeme hraní bez internetu…', exportError: 'Obrázek se nepodařilo stáhnout. Zkuste aplikaci otevřít v prohlížeči.',
+    gallery: 'Vybrat obrázek', alpha: 'Alfa · 16 obrázků', language: 'Jazyk', colorNames: ['Červená','Oranžová','Žlutá','Zelená','Modrá','Fialová','Růžová','Hnědá','Broskvová','Černá','Bílá','Tyrkysová','Korálová','Zlatá','Limetková','Mátová','Světle modrá','Indigová','Levandulová','Malinová','Písková','Šedá','Švestková','Tmavě zelená'],
+  },
+};
+export const palette = ['#ed4f59','#ff963e','#ffd84d','#6bbb6c','#508bed','#9368ce','#f493bf','#a77352','#ffcbab','#343b51','#ffffff','#36b9af','#ff7c76','#dca432','#b4d94c','#a8dec2','#8ecdf3','#5260ae','#c6b0ed','#c94375','#dac298','#8193a4','#774775','#377b54'];
+export const localeNames: Record<Locale,string> = { en: 'English', ru: 'Русский', cs: 'Čeština' };
+export function availableLetters(locale: Locale, group = 'all') {
+  return [...new Set(pictures.filter(p => group === 'all' || p.group === group).map(p => p.words[locale].letter))].sort(new Intl.Collator(locale).compare);
+}
