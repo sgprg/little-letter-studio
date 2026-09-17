@@ -16,7 +16,7 @@ Use https://sgprg.github.io/little-letter-studio/ . iOS/iPadOS 16+ with current 
 
 ## Automated coverage
 
-`npm test` runs the drawing/save/history/language/export/offline/layout scenarios in Chromium at desktop, Android phone, iPad and iPhone viewports. These are **emulated layouts**, not native Android/iOS or physical Apple Pencil acceptance tests. Synthetic pen events exercise the input logic only. Pixel assertions verify visible fill and clipping rather than merely checking DOM changes.
+`npm test` runs 32 drawing/save/history/language/export/offline/layout/input/storage-error scenarios: Chromium at desktop and Android phone viewports, and WebKit at iPad/iPhone viewports. These are **emulated devices**, not native Android/iOS or physical Apple Pencil acceptance tests. Touch-capable projects use touchscreen taps. Synthetic pen events exercise pressure logic only. Pixel assertions verify visible fill and clipping rather than merely checking DOM changes. Offline tests stop the actual temporary origin server after caching, then reload and draw; they do not mock successful network responses. WebKit's simulated offline navigation failed in this environment, so the server-stop approach verifies the cache without depending on that automation behavior.
 
 Run `npm run build` first. Reports and screenshots are in ignored `playwright-report/` and `test-results/`. CI keeps a downloadable browser-checks artifact. Native CI separately compiles the Android APK and an unsigned iOS simulator app; compilation is not device acceptance.
 

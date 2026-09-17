@@ -22,7 +22,7 @@ jobs:
       - run: npm run licenses
       - run: npm audit --audit-level=moderate
       - run: npm run build
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chromium webkit
       - run: npm test -- --workers=2
       - uses: actions/upload-artifact@v4
         if: always()

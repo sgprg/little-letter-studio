@@ -11,14 +11,14 @@ let locale:Locale='en', pictureId='cat', group='all', letter='', expanded=false;
 let engine!:DrawingEngine, offlineReady=false, saveState:'saved'|'saving'|'saveError'='saved';
 let settings={easy:true,penOnly:false}, tool:Tool='fill', color=palette[0], size=22;
 let switchToken=0, saveToken=0, pending=Promise.resolve();
-const memory=new Map<string,Drawing>(), failedLoads=new Set<string>();
+const memory=new Map<string,Drawing>(), failedLoads=new Set<string>(), failedSaves=new Set<string>();
 try {const p=JSON.parse(localStorage.getItem('lls-preferences')||'{}');if(['en','ru','cs'].includes(p.locale))locale=p.locale;if(pictures.some(x=>x.id===p.pictureId))pictureId=p.pictureId;settings={easy:p.easy!==false,penOnly:p.penOnly===true};}catch{}
 const t=()=>text[locale], current=()=>pictures.find(p=>p.id===pictureId)!;
 function preferences(){try{localStorage.setItem('lls-preferences',JSON.stringify({locale,pictureId,...settings}));}catch{}}
 function button(action:string,label:string,body:string,extra=''){return `<button type="button" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${body}</button>`;}
 function language(){return `<label class="language"><span class="sr-only">${t().language}</span><select id="language" aria-label="${t().language}">${Object.entries(localeNames).map(([key,label])=>`<option value="${key}" ${key===locale?'selected':''}>${label}</option>`).join('')}</select></label>`;}
 function render(){
-  if(engine){memory.set(pictureId,engine.drawing);engine.destroy();}
+  if(engine)engine.destroy();
   document.documentElement.lang=locale;document.title=t().brand;
   app.innerHTML=`
   <header class="masthead"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>${t().brand}</span></div><div class="header-actions">${language()}${button('parent',t().parent,icon('lock'), 'class="round parent-button"')}</div></header>
@@ -46,7 +46,7 @@ function render(){
     memory.set(pictureId,engine.drawing);const id=pictureId,snapshot=structuredClone(engine.drawing),ticket=++saveToken;
     saveState=failedLoads.has(id)?'saveError':'saving';updateState();
     if(failedLoads.has(id))return;
-    pending=pending.catch(()=>{}).then(()=>savePicture(id,snapshot)).then(()=>{if(id===pictureId&&ticket===saveToken){saveState='saved';updateState();}}).catch(()=>{if(id===pictureId){saveState='saveError';updateState();}});
+    pending=pending.catch(()=>{}).then(()=>savePicture(id,snapshot)).then(()=>{failedSaves.delete(id);if(id===pictureId&&ticket===saveToken){saveState='saved';updateState();}}).catch(()=>{failedSaves.add(id);if(id===pictureId){saveState='saveError';updateState();}});
   };
   engine.onLimit=()=>toast(t().limit);
   document.querySelector<HTMLSelectElement>('#language')!.addEventListener('change',e=>{
@@ -76,10 +76,10 @@ function renderGallery(){
 }
 async function choose(id:string){
   if(id===pictureId&&memory.has(id))return;
-  const ticket=++switchToken;memory.set(pictureId,engine.drawing);pictureId=id;preferences();
+  const ticket=++switchToken;pictureId=id;preferences();
   engine.setPicture(id,memory.get(id)||emptyDrawing());updatePicture();renderGallery();
   engine.canvas.style.pointerEvents='none';
-  try{if(!memory.has(id))memory.set(id,await loadPicture(id));if(ticket!==switchToken)return;engine.setPicture(id,memory.get(id)!);saveState=failedLoads.has(id)?'saveError':'saved';}
+  try{if(!memory.has(id))memory.set(id,await loadPicture(id));await pending;if(ticket!==switchToken)return;engine.setPicture(id,memory.get(id)!);saveState=failedLoads.has(id)||failedSaves.has(id)?'saveError':'saved';}
   catch{if(ticket!==switchToken)return;failedLoads.add(id);saveState='saveError';toast(t().saveError);}
   finally{if(ticket===switchToken){engine.canvas.style.pointerEvents='';updateState();}}
 }
@@ -129,7 +129,7 @@ app.addEventListener('click',async e=>{
   if(action==='settings')grownups();if(action==='export')await exportPicture();
   if(action==='clear'||action==='clear-all')confirmErase(action==='clear-all');
   if(action==='confirm-clear'){failedLoads.delete(pictureId);engine.clear();document.querySelector<HTMLDialogElement>('#dialog')!.close();}
-  if(action==='confirm-all'){try{await pending;await deletePictures();memory.clear();failedLoads.clear();engine.setPicture(pictureId,emptyDrawing());saveState='saved';updateState();document.querySelector<HTMLDialogElement>('#dialog')!.close();}catch{toast(t().saveError);}}
+  if(action==='confirm-all'){try{await pending;await deletePictures();memory.clear();failedLoads.clear();failedSaves.clear();engine.setPicture(pictureId,emptyDrawing());saveState='saved';updateState();document.querySelector<HTMLDialogElement>('#dialog')!.close();}catch{toast(t().saveError);}}
 });
 render();
 // Restore before accepting any new marks; never overwrite an unread saved drawing.
@@ -138,5 +138,8 @@ const initialId=pictureId;
 loadPicture(initialId).then(d=>{memory.set(initialId,d);if(pictureId===initialId){engine.setPicture(initialId,d);updateState();}}).catch(()=>{failedLoads.add(initialId);if(pictureId===initialId){saveState='saveError';updateState();}}).finally(()=>{if(pictureId===initialId)engine.canvas.style.pointerEvents='';});
 if(Capacitor.isNativePlatform()){offlineReady=true;document.querySelector('#offline-status')!.textContent=t().offline;}
 else if('serviceWorker' in navigator&&import.meta.env.PROD){
-  navigator.serviceWorker.register(new URL('./sw.js',document.baseURI)).then(()=>navigator.serviceWorker.ready).then(()=>{offlineReady=true;document.querySelector('#offline-status')!.textContent=t().offline;}).catch(()=>{document.querySelector('#offline-status')!.textContent='';});
+  navigator.serviceWorker.register(new URL('./sw.js',document.baseURI)).then(()=>navigator.serviceWorker.ready).then(async()=>{
+    if(!navigator.serviceWorker.controller)await new Promise<void>(resolve=>navigator.serviceWorker.addEventListener('controllerchange',()=>resolve(),{once:true}));
+    offlineReady=true;document.querySelector('#offline-status')!.textContent=t().offline;
+  }).catch(()=>{document.querySelector('#offline-status')!.textContent='';});
 }

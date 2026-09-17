@@ -31,7 +31,7 @@ Production and offline checks:
 npm run licenses
 npm run build
 npm run preview
-npx playwright install chromium
+npx playwright install chromium webkit
 npm test
 ```
 

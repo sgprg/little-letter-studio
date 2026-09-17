@@ -1,6 +1,6 @@
 # Contributing
 
-Use Node 22+, `npm ci`, and `npm run dev`. Before a pull request run `npm run licenses`, `npm run build`, and `npm test` after installing Playwright Chromium. Build native clients when touching Capacitor/platform files.
+Use Node 22+, `npm ci`, and `npm run dev`. Before a pull request run `npm run licenses`, `npm run build`, and `npm test` after installing Playwright Chromium and WebKit. Build native clients when touching Capacitor/platform files.
 
 Keep code and content Apache-2.0. Contributions are supplied under the same license unless explicitly documented otherwise. Add a Signed-off-by line (`git commit -s`) to certify the [Developer Certificate of Origin](https://developercertificate.org/). Only submit work you have the right to contribute. Third-party code and assets must have compatible permissive licenses and retained notices; no copyleft or noncommercial content.
 
