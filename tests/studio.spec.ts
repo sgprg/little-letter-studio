@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import { resolve,sep } from 'node:path';
 async function ready(page:Page){await page.goto('/');await expect(page.locator('#word')).toHaveText('cat');await expect(page.locator('#save-state')).toHaveText('Saved on this device');}
-async function at(page:Page,x:number,y:number){const b=(await page.locator('#drawing').boundingBox())!;const px=b.x+x/800*b.width,py=b.y+y/650*b.height;if(await page.evaluate(()=>navigator.maxTouchPoints>0))await page.touchscreen.tap(px,py);else await page.mouse.click(px,py);}
+async function at(page:Page,x:number,y:number){await page.locator('#drawing').scrollIntoViewIfNeeded();const b=(await page.locator('#drawing').boundingBox())!;const px=b.x+x/800*b.width,py=b.y+y/650*b.height;if(await page.evaluate(()=>navigator.maxTouchPoints>0))await page.touchscreen.tap(px,py);else await page.mouse.click(px,py);}
 async function pixel(page:Page,x:number,y:number){return page.locator('#drawing').evaluate((el,{x,y})=>Array.from((el as HTMLCanvasElement).getContext('2d')!.getImageData(x*2,y*2,1,1).data).slice(0,3),{x,y});}
 async function parent(page:Page){await page.locator('.parent-button').click();await page.locator('#answer').fill('15');await page.locator('#gate button').click();}
 
