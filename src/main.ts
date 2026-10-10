@@ -1,27 +1,30 @@
 import './style.css';
 import { pictures, text, palette, localeNames, availableLetters, type Locale } from './content';
 import { svgArt } from './art';
-import { DrawingEngine, emptyDrawing, type Drawing, type Tool } from './drawing';
+import { emptyDrawing, type Drawing, type Tool } from './drawing';
+import { DrawingEngine } from './engine';
 import { loadPicture, savePicture, deletePictures } from './storage';
 import { icon } from './icons';
 import { Capacitor } from '@capacitor/core';
+import { bindPlay, playing, enterPlay, leavePlay, unlockSound, chime } from './play';
 
 const app=document.querySelector<HTMLDivElement>('#app')!;
 let locale:Locale='en', pictureId='cat', group='all', letter='', expanded=false;
 let engine!:DrawingEngine, offlineReady=false, saveState:'saved'|'saving'|'saveError'='saved';
-let settings={easy:true,penOnly:false}, tool:Tool='fill', color=palette[0], size=22;
+let settings={easy:true,penOnly:false,sound:true}, tool:Tool='fill', color=palette[0], size=22;
+const celebrated=new Set<string>();
 let switchToken=0, saveToken=0, pending=Promise.resolve();
 const memory=new Map<string,Drawing>(), failedLoads=new Set<string>(), failedSaves=new Set<string>();
-try {const p=JSON.parse(localStorage.getItem('lls-preferences')||'{}');if(['en','ru','cs'].includes(p.locale))locale=p.locale;if(pictures.some(x=>x.id===p.pictureId))pictureId=p.pictureId;settings={easy:p.easy!==false,penOnly:p.penOnly===true};}catch{}
+try {const p=JSON.parse(localStorage.getItem('lls-preferences')||'{}');if(['en','ru','cs'].includes(p.locale))locale=p.locale;if(pictures.some(x=>x.id===p.pictureId))pictureId=p.pictureId;settings={easy:p.easy!==false,penOnly:p.penOnly===true,sound:p.sound!==false};if(Array.isArray(p.celebrated))for(const id of p.celebrated)if(pictures.some(x=>x.id===id))celebrated.add(id);}catch{}
 const t=()=>text[locale], current=()=>pictures.find(p=>p.id===pictureId)!;
-function preferences(){try{localStorage.setItem('lls-preferences',JSON.stringify({locale,pictureId,...settings}));}catch{}}
+function preferences(){try{localStorage.setItem('lls-preferences',JSON.stringify({locale,pictureId,...settings,celebrated:[...celebrated]}));}catch{}}
 function button(action:string,label:string,body:string,extra=''){return `<button type="button" data-action="${action}" aria-label="${label}" title="${label}" ${extra}>${body}</button>`;}
 function language(){return `<label class="language"><span class="sr-only">${t().language}</span><select id="language" aria-label="${t().language}">${Object.entries(localeNames).map(([key,label])=>`<option value="${key}" ${key===locale?'selected':''}>${label}</option>`).join('')}</select></label>`;}
 function render(){
   if(engine)engine.destroy();
   document.documentElement.lang=locale;document.title=t().brand;
   app.innerHTML=`
-  <header class="masthead"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>${t().brand}</span></div><div class="header-actions">${language()}${button('parent',t().parent,icon('lock'), 'class="round parent-button"')}</div></header>
+  <header class="masthead"><div class="brand"><span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i><i></i></span><span>${t().brand}</span></div><div class="header-actions">${language()}<div class="play-controls">${button('previous',t().previous,icon('left'),'class="round"')}${button('browse',t().gallery,icon('book'),'class="round" aria-expanded="false"')}${button('next',t().next,icon('right'),'class="round"')}</div>${button('fullscreen',t().fullscreen,icon('fullscreen'),'class="round fullscreen-button"')}${button('parent',t().parent,icon('lock'), 'class="round parent-button"')}</div></header>
   <main>
     <div class="book-heading"><div><span class="eyebrow">${t().book}</span><p>${t().tagline}</p></div><span class="edition">${t().alpha}</span></div>
     <section class="studio" aria-label="${t().book}">
@@ -29,7 +32,7 @@ function render(){
       <div class="paper-wrap">
         <div class="paper">
           <div class="word-heading"><div class="word-pair"><span id="letter" class="letter"></span><div><h1 id="word"></h1><p id="sentence"></p></div></div>${button('listen',t().listen,icon('sound'),'class="listen round"')}</div>
-          <canvas id="drawing" aria-label="${t().hint}"></canvas>
+          <div class="drawing-stage"><canvas id="drawing" aria-label="${t().hint}"></canvas><div id="celebration" class="celebration" role="status" hidden><span class="cheer-label"></span><div aria-hidden="true">${Array.from({length:12},(_,i)=>`<i style="--i:${i};--x:${8+i%6*16}%;--y:${24+Math.floor(i/6)*48}%;--spark:${palette[i%6]}">✦</i>`).join('')}</div></div></div>
           <div class="paper-footer"><span>${t().hint}</span><span id="save-state" role="status"></span></div>
         </div>
         <div class="drawing-options"><button type="button" id="easy" data-action="easy" class="mode" aria-pressed="${settings.easy}">${icon('check')}<span>${settings.easy?t().easy:t().free}</span></button><div class="sizes" aria-label="${t().size}">${[10,22,42].map((n,i)=>button(`size:${n}`,[t().small,t().medium,t().large][i],`<i style="width:${8+i*6}px;height:${8+i*6}px"></i>`,`class="size ${size===n?'selected':''}" aria-pressed="${size===n}"`)).join('')}</div></div>
@@ -42,7 +45,10 @@ function render(){
   engine=new DrawingEngine(document.querySelector<HTMLCanvasElement>('#drawing')!);
   engine.tool=tool;engine.color=color;engine.size=size;engine.easy=settings.easy;engine.penOnly=settings.penOnly;
   engine.setPicture(pictureId,memory.get(pictureId)||emptyDrawing());
-  engine.onChange=()=>{
+  engine.onGesture=()=>{if(settings.sound)unlockSound();};
+  engine.onChange=(reason)=>{
+    if(reason==='clear'){celebrated.delete(pictureId);preferences();stopCelebration();}
+    if(reason==='draw'&&engine.complete&&!celebrated.has(pictureId)){celebrated.add(pictureId);preferences();celebrate();}
     memory.set(pictureId,engine.drawing);const id=pictureId,snapshot=structuredClone(engine.drawing),ticket=++saveToken;
     saveState=failedLoads.has(id)?'saveError':'saving';updateState();
     if(failedLoads.has(id))return;
@@ -54,8 +60,21 @@ function render(){
   });
   const dialog=document.querySelector<HTMLDialogElement>('#dialog')!;
   dialog.addEventListener('click',e=>{if(e.target===dialog)dialog.close();});
-  updatePicture();renderPalette();renderGallery();updateState();
+  updatePicture();renderPalette();renderGallery();updateState();bindPlay(updatePlay);
 }
+function updatePlay(){
+  const b=document.querySelector<HTMLButtonElement>('.fullscreen-button');if(!b)return;
+  const label=playing?t().leavePlay:t().fullscreen;b.setAttribute('aria-label',label);b.title=label;b.setAttribute('aria-pressed',String(playing));
+  document.querySelector('.library')?.classList.remove('library-open');
+  document.querySelector('[data-action="browse"]')?.setAttribute('aria-expanded','false');
+}
+let cheerTimer:ReturnType<typeof setTimeout>;
+function stopCelebration(){clearTimeout(cheerTimer);const el=document.querySelector<HTMLElement>('#celebration');if(el)el.hidden=true;}
+function celebrate(){
+  const el=document.querySelector<HTMLElement>('#celebration')!;el.querySelector('.cheer-label')!.textContent=t().hooray;el.hidden=false;
+  if(settings.sound)chime();clearTimeout(cheerTimer);cheerTimer=setTimeout(()=>el.hidden=true,2600);
+}
+function rememberCompletion(){if(engine.complete){celebrated.add(pictureId);preferences();}}
 function updatePicture(){
   const word=current().words[locale];document.querySelector('#letter')!.textContent=word.letter+(word.letter.length>1?' ':'')+word.letter.toLocaleLowerCase(locale);
   document.querySelector('#word')!.textContent=word.word;document.querySelector('#sentence')!.textContent=word.sentence;
@@ -75,11 +94,12 @@ function renderGallery(){
   document.querySelectorAll<HTMLButtonElement>('[data-action^="group:"]').forEach(b=>{const active=b.dataset.action===`group:${group}`;b.classList.toggle('selected',active);b.setAttribute('aria-pressed',String(active));});
 }
 async function choose(id:string){
+  stopCelebration();document.querySelector('.library')?.classList.remove('library-open');document.querySelector('[data-action="browse"]')?.setAttribute('aria-expanded','false');
   if(id===pictureId&&memory.has(id))return;
   const ticket=++switchToken;pictureId=id;preferences();
   engine.setPicture(id,memory.get(id)||emptyDrawing());updatePicture();renderGallery();
   engine.canvas.style.pointerEvents='none';
-  try{if(!memory.has(id))memory.set(id,await loadPicture(id));await pending;if(ticket!==switchToken)return;engine.setPicture(id,memory.get(id)!);saveState=failedLoads.has(id)||failedSaves.has(id)?'saveError':'saved';}
+  try{if(!memory.has(id))memory.set(id,await loadPicture(id));await pending;if(ticket!==switchToken)return;engine.setPicture(id,memory.get(id)!);rememberCompletion();saveState=failedLoads.has(id)||failedSaves.has(id)?'saveError':'saved';}
   catch{if(ticket!==switchToken)return;failedLoads.add(id);saveState='saveError';toast(t().saveError);}
   finally{if(ticket===switchToken){engine.canvas.style.pointerEvents='';updateState();}}
 }
@@ -91,8 +111,9 @@ function gate(){
   document.querySelector('#gate')!.addEventListener('submit',e=>{e.preventDefault();if(document.querySelector<HTMLInputElement>('#answer')!.value.trim()==='15')grownups();else document.querySelector('#gate-error')!.textContent=t().wrong;});
 }
 function grownups(){
-  modal(`<span class="eyebrow">${t().alpha}</span><h2>${t().parent}</h2><p>${t().about}</p><p>${t().privacy}</p><p>${t().install}</p><p>${t().voice}</p><div class="settings-row"><label for="pen-only">${t().penOnly}</label><input type="checkbox" id="pen-only" ${settings.penOnly?'checked':''}></div><p class="small-note">${t().modeHelp}</p><div class="parent-actions">${button('export',t().export,icon('download')+t().export,'class="primary"')}${button('clear',t().clear,t().clear,'class="secondary"')}${button('clear-all',t().clearAll,t().clearAll,'class="danger"')}</div>`);
+  modal(`<span class="eyebrow">${t().alpha}</span><h2>${t().parent}</h2><p>${t().about}</p><p>${t().privacy}</p><p>${t().install}</p><p>${t().childLock}</p><p>${t().voice}</p><div class="settings-row"><label for="pen-only">${t().penOnly}</label><input type="checkbox" id="pen-only" ${settings.penOnly?'checked':''}></div><p class="small-note">${t().modeHelp}</p><div class="settings-row"><label for="sound-effects">${t().soundEffects}</label><input type="checkbox" id="sound-effects" ${settings.sound?'checked':''}></div><p class="small-note">${t().celebrationHelp}</p><div class="parent-actions">${playing?button('leave-play',t().leavePlay,t().leavePlay,'class="secondary"'):''}${button('export',t().export,icon('download')+t().export,'class="primary"')}${button('clear',t().clear,t().clear,'class="secondary"')}${button('clear-all',t().clearAll,t().clearAll,'class="danger"')}</div>`);
   document.querySelector<HTMLInputElement>('#pen-only')!.addEventListener('change',e=>{settings.penOnly=(e.target as HTMLInputElement).checked;engine.penOnly=settings.penOnly;preferences();});
+  document.querySelector<HTMLInputElement>('#sound-effects')!.addEventListener('change',e=>{settings.sound=(e.target as HTMLInputElement).checked;if(settings.sound)unlockSound();preferences();});
 }
 function confirmErase(all:boolean){modal(`<h2>${all?t().confirmAll:t().confirmClear}</h2><div class="parent-actions">${button(all?'confirm-all':'confirm-clear',t().erase,t().erase,'class="danger"')}${button('settings',t().cancel,t().cancel,'class="secondary"')}</div>`);}
 function listen(){
@@ -120,7 +141,10 @@ app.addEventListener('click',async e=>{
   if(action==='size'){size=+value;engine.size=size;document.querySelectorAll('.size').forEach(x=>{x.classList.toggle('selected',x===b);x.setAttribute('aria-pressed',String(x===b));});}
   if(action==='palette'){expanded=!expanded;renderPalette();b.textContent=expanded?'−':'+';b.setAttribute('aria-label',expanded?t().less:t().more);}
   if(action==='easy'){settings.easy=!settings.easy;engine.easy=settings.easy;preferences();b.innerHTML=icon('check')+`<span>${settings.easy?t().easy:t().free}</span>`;b.setAttribute('aria-pressed',String(settings.easy));}
-  if(action==='undo')engine.undo();if(action==='redo')engine.redo();
+  if(action==='undo'){stopCelebration();engine.undo();}if(action==='redo')engine.redo();
+  if(action==='fullscreen'){if(playing)gate();else if(!await enterPlay())toast(t().fullscreenHelp);}
+  if(action==='leave-play'){document.querySelector<HTMLDialogElement>('#dialog')!.close();await leavePlay();}
+  if(action==='browse'){const open=document.querySelector('.library')!.classList.toggle('library-open');b.setAttribute('aria-expanded',String(open));}
   if(action==='picture')await choose(value);
   if(action==='group'){group=value;letter='';renderGallery();}
   if(action==='letter'){letter=letter===value?'':value;renderGallery();}
@@ -129,13 +153,13 @@ app.addEventListener('click',async e=>{
   if(action==='settings')grownups();if(action==='export')await exportPicture();
   if(action==='clear'||action==='clear-all')confirmErase(action==='clear-all');
   if(action==='confirm-clear'){failedLoads.delete(pictureId);engine.clear();document.querySelector<HTMLDialogElement>('#dialog')!.close();}
-  if(action==='confirm-all'){try{await pending;await deletePictures();memory.clear();failedLoads.clear();failedSaves.clear();engine.setPicture(pictureId,emptyDrawing());saveState='saved';updateState();document.querySelector<HTMLDialogElement>('#dialog')!.close();}catch{toast(t().saveError);}}
+  if(action==='confirm-all'){try{await pending;await deletePictures();memory.clear();failedLoads.clear();failedSaves.clear();celebrated.clear();preferences();stopCelebration();engine.setPicture(pictureId,emptyDrawing());saveState='saved';updateState();document.querySelector<HTMLDialogElement>('#dialog')!.close();}catch{toast(t().saveError);}}
 });
 render();
 // Restore before accepting any new marks; never overwrite an unread saved drawing.
 engine.canvas.style.pointerEvents='none';
 const initialId=pictureId;
-loadPicture(initialId).then(d=>{memory.set(initialId,d);if(pictureId===initialId){engine.setPicture(initialId,d);updateState();}}).catch(()=>{failedLoads.add(initialId);if(pictureId===initialId){saveState='saveError';updateState();}}).finally(()=>{if(pictureId===initialId)engine.canvas.style.pointerEvents='';});
+loadPicture(initialId).then(d=>{memory.set(initialId,d);if(pictureId===initialId){engine.setPicture(initialId,d);rememberCompletion();updateState();}}).catch(()=>{failedLoads.add(initialId);if(pictureId===initialId){saveState='saveError';updateState();}}).finally(()=>{if(pictureId===initialId)engine.canvas.style.pointerEvents='';});
 if(Capacitor.isNativePlatform()){offlineReady=true;document.querySelector('#offline-status')!.textContent=t().offline;}
 else if('serviceWorker' in navigator&&import.meta.env.PROD){
   navigator.serviceWorker.register(new URL('./sw.js',document.baseURI)).then(()=>navigator.serviceWorker.ready).then(async()=>{

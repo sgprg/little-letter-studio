@@ -2,7 +2,7 @@
 
 A free, offline-first coloring book for children aged 2+ and their caregivers. English, Russian and Czech. No ads, purchases, accounts, analytics or paid backend. Project code, language data and original vector illustrations are Apache-2.0.
 
-**Alpha 0.1.0 — a working prototype, not a complete alphabet curriculum.**
+**Alpha 0.1.0-alpha.2 — a working prototype, not a complete alphabet curriculum.**
 
 [Play the web alpha](https://sgprg.github.io/little-letter-studio/) · [Research and product direction](docs/RESEARCH.md) · [Device test guide](docs/TESTING.md) · [Architecture](docs/ARCHITECTURE.md)
 
@@ -13,6 +13,10 @@ Open the web alpha in a current browser. On **iPhone/iPad**, use Safari → Shar
 Pick a color and touch a picture. Switch between fill, pencil, brush, crayon and eraser. “Stay inside” clips strokes to their starting region; turn it off for free drawing. The + palette button reveals 24 colors. Change language without losing the picture. Undo/redo and saved drawings are local to the browser/device.
 
 The lock button opens caregiver settings (answer **15**): PNG export/share, pen-only mode, and confirmed clearing. This simple gate reduces accidental taps; it is not authentication. Listening works only if a local voice for the selected language is installed. Missing voices are explained without using an online service.
+
+Tap the fullscreen corners to enter **play mode**: the paper and controls fit the screen in portrait or landscape, with a book button for the picture drawer. Installed Home Screen and native apps start in play mode. Supported browsers also enter browser fullscreen; iPhone/iPad browsers that cannot do this explain Home Screen installation. Leaving play mode through the app goes through the caregiver gate. System gestures and browser Escape remain under device control: use [Apple Guided Access](https://support.apple.com/en-ie/111795) or Android App pinning to keep a child in one app.
+
+Pencil strokes use coalesced samples, interpolated pressure and cached drawing layers. A pen can take over from a pending finger contact; broad contacts and touches immediately after pen use are ignored. Pencil-only mode remains available for resting palms. Coloring every shape produces a brief sparkle and quiet, locally synthesized chime. Caregiver settings can mute it; reduced-motion preferences disable the animation. Completion allows small gaps and never requires coloring the background. White is a valid color. Saved or undone/redone pictures do not repeatedly celebrate; explicitly starting a picture again resets its celebration.
 
 Native Android debug APKs and iOS simulator builds are produced by GitHub Actions when those jobs succeed. See [Actions](https://github.com/sgprg/little-letter-studio/actions). Native iPhone/iPad device installation requires a Mac, Xcode, signing and your own Apple development team. The web install is the immediate test route on Apple devices.
 

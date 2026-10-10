@@ -23,6 +23,10 @@ export const pictures: Picture[] = [
 
 export const text = {
   en: {
+    fullscreen: 'Full screen', leavePlay: 'Leave full screen', soundEffects: 'Celebration sounds', hooray: 'Look what you colored!',
+    fullscreenHelp: 'Play mode fills the page. To hide browser bars on iPhone or iPad, add this app to the Home Screen and open it from there.',
+    childLock: 'To stop children leaving the app on iPhone or iPad: Settings → Accessibility → Guided Access. Enable it, open the app, then triple-click the side, top or Home button to start a session. On Android, use App pinning in device settings. Full screen alone cannot block system swipes.',
+    celebrationHelp: 'A short sparkle and gentle chime celebrate coloring every part of a picture. Tiny gaps are OK. Sounds stay on this device and can be switched off.',
     brand: 'Little Letter Studio', book: 'My coloring book', tagline: 'A little color. A little discovery.',
     animals: 'Animals', world: 'Our world', all: 'All pictures', letters: 'Letters in this book',
     fill: 'Fill', pencil: 'Pencil', brush: 'Brush', crayon: 'Crayon', eraser: 'Eraser',
@@ -44,6 +48,10 @@ export const text = {
     gallery: 'Choose a picture', alpha: 'Alpha · 16 pictures', language: 'Language', colorNames: ['Red','Orange','Yellow','Green','Blue','Purple','Pink','Brown','Peach','Black','White','Teal','Coral','Gold','Lime','Mint','Sky blue','Indigo','Lavender','Rose','Sand','Slate','Plum','Forest green'],
   },
   ru: {
+    fullscreen: 'На весь экран', leavePlay: 'Выйти из полноэкранного режима', soundEffects: 'Звуки радости', hooray: 'Вот какой рисунок получился!',
+    fullscreenHelp: 'Игровой режим занимает всю страницу. Чтобы скрыть панели браузера на iPhone или iPad, добавьте приложение на экран «Домой» и откройте его оттуда.',
+    childLock: 'Чтобы ребёнок не вышел из приложения на iPhone или iPad: Настройки → Универсальный доступ → Гид-доступ. Включите его, откройте приложение и трижды нажмите боковую кнопку, верхнюю кнопку или кнопку «Домой», чтобы начать сеанс. На Android используйте закрепление приложения в настройках устройства. Полноэкранный режим сам по себе не блокирует системные жесты.',
+    celebrationHelp: 'Когда все части картинки раскрашены, появятся искорки и прозвучит короткая мелодия. Небольшие пробелы допустимы. Звуки создаются на устройстве; их можно отключить.',
     brand: 'Мастерская букв', book: 'Моя раскраска', tagline: 'Немного цвета. Немного открытий.',
     animals: 'Животные', world: 'Наш мир', all: 'Все картинки', letters: 'Буквы в этой книге',
     fill: 'Заливка', pencil: 'Карандаш', brush: 'Кисть', crayon: 'Мелок', eraser: 'Ластик', undo: 'Отменить', redo: 'Повторить', colors: 'Цвета', more: 'Ещё цвета', less: 'Меньше цветов',
@@ -64,6 +72,10 @@ export const text = {
     gallery: 'Выбрать картинку', alpha: 'Альфа · 16 картинок', language: 'Язык', colorNames: ['Красный','Оранжевый','Жёлтый','Зелёный','Синий','Фиолетовый','Розовый','Коричневый','Персиковый','Чёрный','Белый','Бирюзовый','Коралловый','Золотой','Лаймовый','Мятный','Голубой','Индиго','Лавандовый','Малиновый','Песочный','Серый','Сливовый','Тёмно-зелёный'],
   },
   cs: {
+    fullscreen: 'Celá obrazovka', leavePlay: 'Opustit celou obrazovku', soundEffects: 'Zvuky při dokončení', hooray: 'Podívej, co jsi vybarvil!',
+    fullscreenHelp: 'Herní režim vyplní stránku. Chcete-li na iPhonu nebo iPadu skrýt lišty prohlížeče, přidejte aplikaci na plochu a otevřete ji odtud.',
+    childLock: 'Aby dítě nemohlo opustit aplikaci na iPhonu nebo iPadu: Nastavení → Zpřístupnění → Asistovaný přístup. Zapněte jej, otevřete aplikaci a trojím stisknutím bočního tlačítka, horního tlačítka nebo tlačítka plochy spusťte relaci. Na Androidu použijte připnutí aplikace v nastavení zařízení. Samotná celá obrazovka systémová gesta nezablokuje.',
+    celebrationHelp: 'Po vybarvení všech částí obrázku se objeví jiskřičky a zazní krátká melodie. Drobné mezery nevadí. Zvuky vznikají přímo v zařízení a lze je vypnout.',
     brand: 'Dílna písmenek', book: 'Moje omalovánky', tagline: 'Trochu barev. Trochu objevování.',
     animals: 'Zvířata', world: 'Náš svět', all: 'Všechny obrázky', letters: 'Písmena v této knize',
     fill: 'Vybarvit', pencil: 'Pastelka', brush: 'Štětec', crayon: 'Voskovka', eraser: 'Guma', undo: 'Zpět', redo: 'Znovu', colors: 'Barvy', more: 'Další barvy', less: 'Méně barev',

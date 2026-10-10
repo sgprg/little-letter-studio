@@ -87,6 +87,6 @@ test('pen pressure and pen-only touch rejection',async({page})=>{
   expect(await pixel(page,190,92)).toEqual([255,255,255]);expect(await pixel(page,190,142)).toEqual([237,79,89]);await expect(canvas).toHaveAttribute('data-actions','2');
 });
 test('unavailable storage is surfaced while drawing remains usable',async({page})=>{
-  await page.addInitScript(()=>{indexedDB.open=()=>{throw new DOMException('Storage unavailable','SecurityError');};});
+  await page.addInitScript(()=>{IDBFactory.prototype.open=()=>{throw new DOMException('Storage unavailable','SecurityError');};});
   await page.goto('/');await expect(page.locator('#save-state')).toContainText('Could not save');await at(page,395,415);await expect(page.locator('#drawing')).toHaveAttribute('data-actions','1');expect(await pixel(page,395,415)).toEqual([237,79,89]);await expect(page.locator('#save-state')).toContainText('Could not save');
 });

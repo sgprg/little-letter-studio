@@ -1,4 +1,5 @@
 const paths:Record<string,string>={
+  fullscreen:'<path d="M3 10V4h6M17 4h6v6M23 18v6h-6M9 24H3v-6"/>',
   fill:'<path d="m9 3 10 10-8 8L1 11zM5 7l8 8M18 17s4 4 4 6a3 3 0 0 1-6 0c0-2 2-6 2-6Z"/>',
   pencil:'<path d="m4 17 12-12 4 4L8 21l-5 1zM13 8l4 4M4 17l4 4"/>',
   brush:'<path d="M14 13 22 2c1-1 2 0 1 2l-7 12zM14 14c-9-2-4 8-12 8 9 4 17-1 14-6"/>',
