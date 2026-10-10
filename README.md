@@ -2,7 +2,7 @@
 
 A free, offline-first coloring book for children aged 2+ and their caregivers. English, Russian and Czech. No ads, purchases, accounts, analytics or paid backend. Project code, language data and original vector illustrations are Apache-2.0.
 
-**Alpha 0.1.0-alpha.2 — a working prototype, not a complete alphabet curriculum.**
+**Alpha 2 (0.1.0-alpha.2) — a working prototype, not a complete alphabet curriculum.**
 
 [Play the web alpha](https://sgprg.github.io/little-letter-studio/) · [Research and product direction](docs/RESEARCH.md) · [Device test guide](docs/TESTING.md) · [Architecture](docs/ARCHITECTURE.md)
 

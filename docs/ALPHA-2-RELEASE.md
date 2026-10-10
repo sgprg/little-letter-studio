@@ -12,3 +12,5 @@ Play at https://sgprg.github.io/little-letter-studio/. If an older offline copy 
 Android downloads are debug-signed sideload builds. CI debug keys can differ between releases: if Android refuses an update, export existing pictures before removing the old installation. The iOS ZIP is an unsigned simulator app for Xcode on a Mac, not a signed device IPA. Home Screen installation is the immediate test route for physical iPhone/iPad devices.
 
 Physical Apple Pencil latency/palm rejection, native share sheets, real speaker volume and device-level gesture locking still require the checks in [TESTING.md](TESTING.md).
+
+Validation: 57 browser checks passed locally and in Linux CI; three non-desktop Fullscreen API cases are explicitly skipped while their fallback paths are tested. Android and iOS simulator builds succeeded. Production fullscreen drawing, saving and offline restoration passed. See [validation evidence](https://github.com/sgprg/little-letter-studio/blob/main/docs/VALIDATION-ALPHA-2.md).
